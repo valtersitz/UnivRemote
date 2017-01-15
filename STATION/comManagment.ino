@@ -1,12 +1,15 @@
 
-
-void sendMessage() {
+void addSwitch() {
   for (int i = sizeof(remoteNum); i > 0; i--) {
     remoteNum[i] = remoteNum[i - 1];
   }
   remoteNum[0] = switchCheck;
   Serial.print("le bouton est sur :     ");
   Serial.print(switchCheck);
+}
+
+void sendMessage() {
+  addSwitch();
   Serial.print("\n sending message:        ");
   vw_send((byte *) remoteNum, sizeof(remoteNum));
   vw_wait_tx;
@@ -24,9 +27,9 @@ void sendMessage() {
       }
     }
   }
-  for (int r = 0; r < sizeof(remoteNum); r++) {
-    Serial.print(remoteNum[r], HEX);
-  }
+//  for (int r = 0; r < sizeof(remoteNum); r++) {
+//    Serial.print(remoteNum[r], HEX);
+//  }
   Serial.print("\n");
   sending = false;
 }

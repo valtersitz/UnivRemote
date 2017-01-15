@@ -11,9 +11,10 @@ boolean buttonManagment() {
   if (!buttonFree()) {                                          // si un appui est lu
     while (!buttonFree()) {                                     // on répète tant qu'un bouton au moins est appuyé
       compared = buttonRead();                                  //lecture de la matrice, retourne vrai si on valide.
-    }
-    return compared;                                            //retourne true si valider, ie si pret a envoyer le message 
+    }                                           //retourne true si valider, ie si pret a envoyer le message
+  //return compared;
   }
+  return compared;
 }
 
 boolean buttonRead() {
@@ -27,7 +28,7 @@ boolean buttonRead() {
         buttonPressedBuff[pos] = 'D';                           //le bouton est appuyer, D veut dire DOWN
         buttonCompare(pos);                                     //on regarde quel bouton est appuyer et on implemente
       }
-      else { 
+      else {
         buttonPressedBuff[pos] = 'U';                           // the button is not pressed
       }
       pos++;                                                    //on passe à la position suivante
@@ -35,47 +36,68 @@ boolean buttonRead() {
     digitalWrite(buttonLine[l], LOW);                           //on replace la ligne en LOW
     delay(REBOUND_TIME);                                        //tempo anti rebond
   }
-//  if (!buttonFree()) {                                          //on teste si l'appui est toujours actif; si oui on met à jour la position saisie dans le buffer PAS VRAIMENT UTILISE ... juste pour garder l'idee
-//    for (int t = 0; t < buttonNumber; t++) {
-//      buttonPressed[t] = buttonPressedBuff[t];
-//    }
-//  }
-  compare = buttonCompare(buttonPressedBuff);                   //au relâchement, on sauvegarde
+  //  if (!buttonFree()) {                                          //on teste si l'appui est toujours actif; si oui on met à jour la position saisie dans le buffer PAS VRAIMENT UTILISE ... juste pour garder l'idee
+  //    for (int t = 0; t < buttonNumber; t++) {
+  //      buttonPressed[t] = buttonPressedBuff[t];
+  //    }
+  //  }
+  //compare = buttonCompare(buttonPressedBuff);                   //au relâchement, on sauvegarde
+  compare = buttonCompare(pos);                   //au relâchement, on sauvegarde
   return compare;
 }
 
 boolean buttonCompare(int posi) {
-  if (posi == 3) {
+  if (posi == 3) {                                              // if we press the cancel button
     for ( int j = 0; j < sizeof(remoteNum); j++) {
-      remoteNum[j] = 0;
+      remoteNum[j] = 0;                                         // the message is resset, like everything else...
     }
     comp = 0;
     valid = 0;
     Serial.print("i am cancelling! \n\n\n\n");
-    sevSegManagment(3, comp);
+    sevSegMan(sizeof(remoteNum), remoteNum);
+    //    sevSegManagment(3, comp);
     delay(1000);
-    resetFunc();
+    resetFunc();                                                // we reset the module. Actually that could be enough to reset everything...
   }
-  else if (posi == 2) {
-    Serial.print("i am validing first phase! \n");
-    comp ++;
-    if (comp % 4 == 0) {
-      valid++;
+  else if (posi == 2) {                                         // if we press valid button
+    Serial.print("i am validing \n");
+    comp ++;                                                    // it means we are moving forward in the message
+
+    // AJOUTER ICI UNE CONDITION MOD 4 SELON POSITION DU SWITCH : quqnd on cherche on a pas besoin de donner les alarmes
+    
+    if (comp % 7 == 0) {                                        // if the message is over
+      valid++;                                                  // final validation is done
       //comp = 0;         //only for  sevseg with 4 nodes
-      if (valid > 1) {
-        Serial.print("i am validing last phase\n\n\n\n\n\n\n");
+      if (valid > 0) {
+        Serial.print("message is over \n\n\n\n\n\n\n");
         valid = 0;
         sending = true;
         return true;
       }
     }
-    sevSegManagment(2, comp); //valid
+    sevSegMan(sizeof(remoteNum), remoteNum);
+    //    sevSegManagment(2, comp); //valid
   }
-  else if (posi == 0 || posi == 1) {
-    remoteNum[comp]++;
-    sevSegManagment(posi, comp);
-    Serial.print("i am implementing ! \n");
+  else if (posi == 0) {                           // if we press plusn button
+    remoteNum[comp]++;                            // implementation of the position
+    if (remoteNum[comp] > 9 ) {
+      remoteNum[comp] = 0;
+    }
+
+    sevSegMan(sizeof(remoteNum), remoteNum);
+    //    sevSegManagment(posi, comp);
+    Serial.print("i am adding ! \n");
   }
+  else if (posi == 1) {                           // if we press minus button
+    remoteNum[comp] = remoteNum[comp] - 1;                          // implementation of the position
+    if (remoteNum[comp] < 0 ) {
+      remoteNum[comp] = 9;
+    }
+    sevSegMan(sizeof(remoteNum), remoteNum);
+    //    sevSegManagment(posi, comp);
+    Serial.print("i am substracting ! \n");
+  }
+  return sending;
 }
 
 

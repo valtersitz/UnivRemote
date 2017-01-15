@@ -79,7 +79,7 @@ void setup() {
 void loop() {
   batteryManagment();
   switchManagment();
-  if (buttonManagment()) {
+ if ( buttonManagment()){
     if (sending) {
       sendMessage();
     }
