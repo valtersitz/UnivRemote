@@ -1,4 +1,5 @@
 #include <VirtualWire.h>
+#include <EEPROM.h>
 
 
 //-----------------------------------------------------------------------------
@@ -11,11 +12,18 @@
 #define ALARM_TIME 15000          // duration of alarm 
 #define RFSPEED 2000              // for RF communication 
 
+//#define REMOTENUM_ADDR  0;        May be needed in case the addr of remoteNum is not always the same. Same for alarmEnable
+
 //-----------------------------------------------------------------------------
 
 
-byte message[MESSAGE_LEN];
-byte remoteNum[REMOTENUM_LEN]; //remote number in binary
+//byte message[MESSAGE_LEN];
+//byte remoteNum[REMOTENUM_LEN]; //remote number in binary
+
+byte* message = 12;
+byte* remoteNum = 24;
+
+
 
 int rxRFPin = 8;
 
@@ -52,7 +60,7 @@ boolean batteryCheck = false;
 
 void setup() {
   Serial.begin(9600);
-  
+
   //RF setup
   vw_set_rx_pin(rxRFPin);
   vw_setup(RFSPEED);
@@ -71,9 +79,12 @@ void setup() {
   digitalWrite(soundPin, LOW);
   digitalWrite(lightPin, LOW);
 
-  for (int rst = 0; rst < VW_MAX_MESSAGE_LEN; rst++) {
-    message[rst] = 0;
-  }
+  //  for (int rst = 0; rst < VW_MAX_MESSAGE_LEN; rst++) {
+  //    message[rst] = 0;
+  //  }
+
+  message = malloc(MESSAGE_LEN * sizeof(byte));
+  remoteNum = malloc(REMOTENUM_LEN * sizeof(byte));
 }
 
 //-----------------------------------------------------------------------

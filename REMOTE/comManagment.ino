@@ -14,8 +14,11 @@ byte getMessage() {
   {
     message[i] = 0;
   }
+  
+  //Serial.print("here com");
   if ( vw_get_message((byte *) buf, &buflen) ) {            // I get the message
     Serial.print("message is: ");
+ // Serial.print("here get message");
     for (i = 0; i < MESSAGE_LEN; i++)
     {
       message[i] = buf[i];                                  // save it
