@@ -41,8 +41,8 @@ boolean buttonRead() {
   //      buttonPressed[t] = buttonPressedBuff[t];
   //    }
   //  }
-  //compare = buttonCompare(buttonPressedBuff);                   //au relâchement, on sauvegarde
-  compare = buttonCompare(pos);                   //au relâchement, on sauvegarde
+  //compare = buttonCompare(buttonPressedBuff);                  //au relâchement, on sauvegarde
+  compare = buttonCompare(pos);                                  //au relâchement, on sauvegarde
   return compare;
 }
 
@@ -63,11 +63,10 @@ boolean buttonCompare(int posi) {
     Serial.print("i am validing \n");
     comp ++;                                                    // it means we are moving forward in the message
 
-    // AJOUTER ICI UNE CONDITION MOD 4 SELON POSITION DU SWITCH : quqnd on cherche on a pas besoin de donner les alarmes
+    // AJOUTER ICI UNE CONDITION MOD 4 SELON POSITION DU SWITCH : quand on cherche on a pas besoin de donner les alarmes
     
     if (comp % 7 == 0) {                                        // if the message is over
       valid++;                                                  // final validation is done
-      //comp = 0;         //only for  sevseg with 4 nodes
       if (valid > 0) {
         Serial.print("message is over \n\n\n\n\n\n\n");
         valid = 0;
@@ -80,7 +79,7 @@ boolean buttonCompare(int posi) {
   }
   else if (posi == 0) {                           // if we press plusn button
     remoteNum[comp]++;                            // implementation of the position
-    if (remoteNum[comp] > 9 ) {
+    if (remoteNum[comp] > 9 ) {                   // we are dealing with bytes so up to 255 but we want it keep it < 10 
       remoteNum[comp] = 0;
     }
 
@@ -89,13 +88,13 @@ boolean buttonCompare(int posi) {
     Serial.print("i am adding ! \n");
   }
   else if (posi == 1) {                           // if we press minus button
-    remoteNum[comp] = remoteNum[comp] - 1;                          // implementation of the position
-    if (remoteNum[comp] < 0 ) {
+    remoteNum[comp] = remoteNum[comp] - 1;        // implementation of the position
+    if (remoteNum[comp] == 255 ) {                // we are dealing with bytes so up to 255 but we want it keep it < 10 
       remoteNum[comp] = 9;
     }
     sevSegMan(sizeof(remoteNum), remoteNum);
     //    sevSegManagment(posi, comp);
-    Serial.print("i am substracting ! \n");
+    Serial.print("i am subtracting ! \n");
   }
   return sending;
 }
